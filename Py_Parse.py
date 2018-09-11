@@ -13,16 +13,29 @@ class ParseNode:
         self.rule = rule
         self.children = children
     def __repr__(self):
-        return str(self.rule.orig) + " [ " + str(self.children) + " ] "
+        s = ""
+        for child in self.children:
+            if(type(child) == ParseNode):
+                s = s + str(child.rule.orig)
+            else:
+                s = s + child.val
+            
+        return str(self.rule.orig) + " [ " + s + " ] "
     def display(self, level = 0):
         """Used for printing out the tree"""
         print("|    " * level + str(self.rule.orig))
         for child in self.children:
             child.display(level+1)
     def bracket_repr(self): # http://ironcreek.net/phpsyntaxtree/?
-        outstr = "[" + str(self.rule.orig) + " "
-        outstr += ' '.join(child.bracket_repr() for child in self.children)
-        outstr += "]"
+        s = ""
+        for child in self.children:
+            if(type(child) == ParseNode):
+                temp = child.bracket_repr()
+                s = s + temp
+            else:
+                s = s + child.val
+            
+        outstr =  str(self.rule.orig) + " [ " + s + " ] "
         return outstr
 
 class ParseException(Exception):
@@ -32,7 +45,7 @@ class ParseException(Exception):
     def __str__(self):
         return "Error parsing input.\nEnd tree: " + str(self.stack)
 
-def generate_tree(tokens, grammar ):
+def generate_tree(tokens, grammar, start_symbol ):
     """
         start_symbol,
         comment_start, comment_end,
@@ -86,17 +99,15 @@ def generate_tree(tokens, grammar ):
     self.skip_whitespace = skip_whitespace
     self.re_ws_skip = re.compile('\S')
     """
-
     # stores the stack of symbols for the bottom-up shift-reduce parser
     stack = ""
     # stores the tree itself in an analogous stack
-    tree_stack = ""
-
+    tree_stack = [start_symbol]
     # We keep looping until none of the rules apply anymore and there are no
     # more tokens to inject into the stack.
     while True:
         print(stack) # great for debugging
-
+      
         #skip_neg = False # don't apply the unary +/- rule if binary +/- skipped
         #skip_point = False # don't apply pointer rule if binary * skipped
 
@@ -128,14 +139,29 @@ def generate_tree(tokens, grammar ):
                         and tokens[0].priority < rule.priority ):
                             break
                     else:
+                        
                         # we apply the rule!
-                        node = ParseNode(rule, tree_stack[m.start():])
+                        temp = ""
+                        
+                        # Go back to check which token object is start of rule
+                        for i, token in enumerate(tree_stack[::-1]):
+                            # if the rule matches, this is the position for the stack
+                            if(gramm.match(temp)):break
+                            # special case if object is ParseNode    
+                            if(type(token) != ParseNode ):
+                                temp = token.type + temp
+                            # case if object is Token
+                            else:
+                                temp = str(token.rule.orig) + temp
+                            #print(temp)
+                        print(i)
+                        node = ParseNode(rule, tree_stack[-i:])
                         print(node)
                         # simplify the tree stack
-                        tree_stack = tree_stack[:m.start()] + str(node)
+                        tree_stack = tree_stack[:-i] + [node]
                         #ParseNode(rule,)
                         # simplify the stack
-                        stack = stack[:m.start()] + rule.orig 
+                        stack = stack[:m.start()] + rule.orig
                         break # don't bother checking the rest of the rules
                         
         else: # none of the rules matched
@@ -143,12 +169,11 @@ def generate_tree(tokens, grammar ):
             if not tokens: break
             else: # inject another token into the stack
                 stack = stack+tokens[0].type
-                tree_stack = tree_stack + tokens[0].type
+                tree_stack.append(tokens[0])
                 tokens = tokens[1:]
     
     # when we're done, we should have the start symbol left in the stack
-    if stack == "FUNCT_DECLARE":
-        return node.bracket_repr
-        return 0
+    if tree_stack[0] == start_symbol:
+        return node
     else:
         raise ParseException(tree_stack)

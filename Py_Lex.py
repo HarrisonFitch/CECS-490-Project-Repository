@@ -168,7 +168,11 @@ if __name__ == '__main__':
                 print(index, tok.val, tok.priority)
     except LexerError as err:
         print('LexerError at position %s' % err.pos)
-    tree = Py_Parse.generate_tree(token_list, Py_Rules.rules)
+    
+    # start symbol used in parser
+    start_symbol = Token("START", "START", None, None)
+    
+    tree = Py_Parse.generate_tree(token_list, Py_Rules.rules, start_symbol)
     print(tree)
-            
+    print(tree.bracket_repr())
 
