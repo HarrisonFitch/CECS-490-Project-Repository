@@ -23,16 +23,35 @@ class Rule:
 # adhere to Regex's grammar.
 ########################################################################
 
-main_funct  = Rule('(TYPE_INT)(MAIN)(LP)(RP)(LB)(STATEMENT)?(RB)'                                              ,'FUNCT_DECLARE','MAIN', None)
-add_rule    = Rule('(NUMBER|IDENTIFIER|STATEMENT)(PLUS)(NUMBER|IDENTIFIER|STATEMENT)'                          ,'E','ADD_RULE', None)
-int_declare = Rule('((TYPE_INT)(IDENTIFIER)(EQUALSIGN)(E|NUMBER|IDENTIFIER)(SEMICOLON)|(TYPE_INT)(IDENTIFIER)(SEMICOLON))','STATEMENT','INT_DECLARE', None)
+main_funct      = Rule('(TYPE_INT)(MAIN)(LP)(RP)(LB)(STATEMENT)*?(RB)',                     'FUNCT_DECLARE','MAIN', None)
+int_declare     = Rule('((TYPE_INT)(IDENTIFIER)(EQUALSIGN)(E|NUMBER|IDENTIFIER)(SEMICOLON)|'
+                       '(TYPE_INT)(IDENTIFIER)(SEMICOLON))',                                'STATEMENT','INT_DECLARE', None)
 
+if_statement    = Rule('(IF)(LP)(E|NUMBER|IDENTIFIER)(RP)(LB)(STATEMENT)*?(RB)',            'STATEMENT','IF_STATEMENT', None)
+for_loop        = Rule('(FOR)(LP)(STATEMENT)(E)(SEMICOLON)(IDENTIFIER)(EQUALSIGN)(E)(RP)(LB)(STATEMENT)?(RB)','STATEMENT', None)
+
+assign_rule     = Rule('(IDENTIFIER)(EQUALSIGN)(E|NUMBER|IDENTIFIER)(SEMICOLON)',           'STATEMENT','ASSIGN', None)
+add_rule        = Rule('(NUMBER|IDENTIFIER|E)(PLUS)(NUMBER|IDENTIFIER|E)',                  'E','E_ADD_RULE', None)
+rel_equal       = Rule('(E|IDENTIFIER|NUMBER)(EQUALVALUE)(E|IDENTIFIER|NUMBER)',            'E','E_EQUALS_RULE', None)
+rel_less_than   = Rule('(E|IDENTIFIER|NUMBER)(LESSTHAN)(E|IDENTIFIER|NUMBER)',              'E','E_LESS_THAN', None)
+
+"""
+'LESSTHAN', 20),
+        ('\<=',                         'LESSTHANEQUAL', 20),
+        ('\>',                          'GREATERTHAN', 20),
+        ('\<=',                         'GREATERTHANEQUAL', 20),
+"""
 #Rule('/(TYPE_INT)/'                                       ,'STATEMENT'  ,'MAIN'       , None),
 
 rules = [
     main_funct,
     add_rule,
-    int_declare]
+    int_declare,
+    rel_less_than,
+    rel_equal,
+    assign_rule,
+    if_statement,
+    for_loop]
 """
 main_func_dec_cont,
 main_func_def,

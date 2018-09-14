@@ -132,22 +132,24 @@ if __name__ == '__main__':
         ('return',                      'RETURN', 5),
         ('else',                        'ELSE', 10),
         ('if',                          'IF', 10),
+        ('for',                         'FOR', 10),
         ('[_a-zA-Z][_a-zA-Z0-9]{0,31}', 'IDENTIFIER', 8),
         ('\{',                          'LB', 9),
         ('\}',                          'RB', 10),
         ('\;',                          'SEMICOLON', 70),
-        ('\<',                          'LESSTHAN', 20),
         ('\<=',                         'LESSTHANEQUAL', 20),
-        ('\>',                          'GREATERTHAN', 20),
+        ('\<',                          'LESSTHAN', 20),
         ('\<=',                         'GREATERTHANEQUAL', 20),
+        ('\>',                          'GREATERTHAN', 20),
         ('\+',                          'PLUS', 70),
         ('\-',                          'MINUS', 70),
         ('\*',                          'MULTIPLY', 65),
         ('\/',                          'DIVIDE', 65),
         ('\(',                          'LP', 40),
         ('\)',                          'RP', 40),
-        ('=',                           'EQUALSIGN', 30),
         ('==',                          'EQUALVALUE', 20),
+        ('=',                           'EQUALSIGN', 30),
+        
     ]
     with open(filename, 'r') as myfile:
         data=myfile.read().replace('\n', '')

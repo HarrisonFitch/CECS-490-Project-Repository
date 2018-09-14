@@ -174,6 +174,7 @@ def generate_tree(tokens, grammar, start_symbol ):
     
     # when we're done, we should have the start symbol left in the stack
     if tree_stack[0] == start_symbol:
+        print(stack)
         return node
     else:
         raise ParseException(tree_stack)
