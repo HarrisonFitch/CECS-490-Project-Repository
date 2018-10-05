@@ -35,7 +35,7 @@ class ParseNode:
             else:
                 s = s + child.val
             
-        outstr =  str(self.rule.orig) + " [ " + s + " ] "
+        outstr =  "<" + str(self.rule.orig) + ':' + str(self.rule.new) + ">" + " [ " + s + " ] "
         return outstr
 
 class ParseException(Exception):
@@ -48,82 +48,45 @@ class ParseException(Exception):
 def generate_tree(tokens, grammar, start_symbol ):
     """
         start_symbol,
-        comment_start, comment_end,
-        add_rule, neg_rule,
-        mult_rule, pointer_rule,
-        dec_sep_rule, dec_exp_symbol
+        grammar,
+        start_symbol
     """
     """
         Generates a syntax tree out of a list of tokens.
-        rules - A list of rules to apply. See rules.py.
-        start_symbol - The start symbol in the list of rules.
-        comment_start/end - The symbols that start/end a comment
-        add_rule - The binary +/- rule
-        neg_rule - The unary +/- rule
-        mult_rule - The binary multiplication rule
-        pointer_rule - The pointer rule
-        dec_sep_rule - The base declaration separator rule
-        dec_exp_symbol - The symbol for a declaration
+        rules - A list of rules to apply. See Py_Rules.py.
+        start_symbol - The start symbol used as a placeholder for the stack.
     """
     """
         Create a parser.
     rules:
-        A list of rules. Each rule is a `regex, type`
-        pair, where `regex` is the regular expression used
-        to recognize the token and `type` is the type
-        of the token to return when it's recognized.
-        skip_whitespace:
-        If True, whitespace (\s+) will be skipped and not
-        reported by the lexer. Otherwise, you have to
-        specify your rules for whitespace, or it will be
-        flagged as an error.
+        A list of rules. See Py_Rules.py.Constructs parse tree using Rules 
+        to shift-reduce parse the stack of tokens. The stack of tokens is 
+        from the lexer. See Py_Lex.py.
     """
-    # All the regexes are concatenated into a single one
-    # with named groups. Since the group names must be valid
-    # Python identifiers, but the token types used by the
-    # user are arbitrary strings, we auto-generate the group
-    # names and map them to token types.
-    #
-    """
-    idx = 1
-    regex_parts = []
-    self.group_type = {}
     
-    for regex, type in grammar:
-        groupname = 'GROUP%s' % idx
-        regex_parts.append('(?P<%s>%s)' % (groupname, regex))
-        self.group_type[groupname] = type
-        idx += 1
-    
-    self.regex = re.compile('|'.join(regex_parts))
-    self.skip_whitespace = skip_whitespace
-    self.re_ws_skip = re.compile('\S')
-    """
     # stores the stack of symbols for the bottom-up shift-reduce parser
     stack = ""
     # stores the tree itself in an analogous stack
     tree_stack = [start_symbol]
-    # We keep looping until none of the rules apply anymore and there are no
-    # more tokens to inject into the stack.
+    """
+        Loop through list of rules applying each to the current stack. If no
+        rules match, shift on the next token to the stack.
+    """
     while True:
         print(stack) # great for debugging
       
-        #skip_neg = False # don't apply the unary +/- rule if binary +/- skipped
-        #skip_point = False # don't apply pointer rule if binary * skipped
-
-        # Example of above:
-        # If we have 3 + 4 * 5, we will skip applying add_rule to 3 + 4 because
-        # * has higher priority. However, we then also need to skip applying the
-        # unary + rule to the +4.
         for rule in grammar:
             # The rule can't possibly match if there are more symbols to match
             # than there are symbols in the stack
             gramm = re.compile(rule.value)
+            # if rule is not present in stack, go to next rule
             if not gramm.search(stack): continue
             else:
                 # check if the rule matches with the top of the stack
                 m = gramm.search(stack)
                 #print(m.group())
+                
+                # rule doesn't match 
                 if not (m): break
                 else:
                     # This rule matched!
@@ -167,12 +130,12 @@ def generate_tree(tokens, grammar, start_symbol ):
         else: # none of the rules matched
             # if we're all out of tokens, we're done
             if not tokens: break
-            else: # inject another token into the stack
+            else: # push another token onto the stack
                 stack = stack+tokens[0].type
                 tree_stack.append(tokens[0])
                 tokens = tokens[1:]
     
-    # when we're done, we should have the start symbol left in the stack
+    # when we're done, we should have the start symbol (placeholder) left in the stack
     if tree_stack[0] == start_symbol:
         print(stack)
         return node

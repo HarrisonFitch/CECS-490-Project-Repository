@@ -139,7 +139,7 @@ if __name__ == '__main__':
         ('\;',                          'SEMICOLON', 70),
         ('\<=',                         'LESSTHANEQUAL', 20),
         ('\<',                          'LESSTHAN', 20),
-        ('\<=',                         'GREATERTHANEQUAL', 20),
+        ('\>=',                         'GREATERTHANEQUAL', 20),
         ('\>',                          'GREATERTHAN', 20),
         ('\+',                          'PLUS', 70),
         ('\-',                          'MINUS', 70),
@@ -176,5 +176,6 @@ if __name__ == '__main__':
     
     tree = Py_Parse.generate_tree(token_list, Py_Rules.rules, start_symbol)
     print(tree)
+    print("\n\n\n\n")
     print(tree.bracket_repr())
 

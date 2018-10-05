@@ -1,6 +1,5 @@
 """
 Rule class to represent grammar rules for parser.
-
 """
 
 class Rule:
@@ -27,13 +26,15 @@ main_funct      = Rule('(TYPE_INT)(MAIN)(LP)(RP)(LB)(STATEMENT)*?(RB)',         
 int_declare     = Rule('((TYPE_INT)(IDENTIFIER)(EQUALSIGN)(E|NUMBER|IDENTIFIER)(SEMICOLON)|'
                        '(TYPE_INT)(IDENTIFIER)(SEMICOLON))',                                'STATEMENT','INT_DECLARE', None)
 
-if_statement    = Rule('(IF)(LP)(E|NUMBER|IDENTIFIER)(RP)(LB)(STATEMENT)*?(RB)',            'STATEMENT','IF_STATEMENT', None)
-for_loop        = Rule('(FOR)(LP)(STATEMENT)(E)(SEMICOLON)(IDENTIFIER)(EQUALSIGN)(E)(RP)(LB)(STATEMENT)?(RB)','STATEMENT', None)
+if_statement    = Rule('((IF)(LP)(E|NUMBER|IDENTIFIER)(RP)(LB)(STATEMENT)*?(RB)|'
+                         '(IF)(LP)(E|NUMBER|IDENTIFIER)(RP)(STATEMENT))',            'STATEMENT','IF_STATEMENT', None)
+for_loop        = Rule('(FOR)(LP)(STATEMENT)(E)(SEMICOLON)(IDENTIFIER)(EQUALSIGN)(E)(RP)(LB)(STATEMENT)?(RB)','STATEMENT','FOR_LOOP', None)
 
 assign_rule     = Rule('(IDENTIFIER)(EQUALSIGN)(E|NUMBER|IDENTIFIER)(SEMICOLON)',           'STATEMENT','ASSIGN', None)
 add_rule        = Rule('(NUMBER|IDENTIFIER|E)(PLUS)(NUMBER|IDENTIFIER|E)',                  'E','E_ADD_RULE', None)
 rel_equal       = Rule('(E|IDENTIFIER|NUMBER)(EQUALVALUE)(E|IDENTIFIER|NUMBER)',            'E','E_EQUALS_RULE', None)
 rel_less_than   = Rule('(E|IDENTIFIER|NUMBER)(LESSTHAN)(E|IDENTIFIER|NUMBER)',              'E','E_LESS_THAN', None)
+rel_greater_than   = Rule('(E|IDENTIFIER|NUMBER)(GREATERTHAN)(E|IDENTIFIER|NUMBER)',              'E','E_GREATER_THAN', None)
 
 """
 'LESSTHAN', 20),
@@ -48,6 +49,7 @@ rules = [
     add_rule,
     int_declare,
     rel_less_than,
+    rel_greater_than,
     rel_equal,
     assign_rule,
     if_statement,
